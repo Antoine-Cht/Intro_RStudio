@@ -199,9 +199,6 @@ barplot(c(nF,nM),
 
 
 
-library(ggplot2)
-# Ressources GGPLOT 2 : https://rstudio.github.io/cheatsheets/data-visualization.pdf
-
 
 #### __ 4.2. Les données continues __ ####
 
@@ -244,9 +241,54 @@ ggplot(data = dt, aes(x=Age, fill=Sex)) +    # En fonction du sexe
 # _ 4.1. Le scatter plot ( x ~ y )
 
 # On veux observer la relation entre l'âge et la force de Handgrip
+plot(dt$Age, dt$Handgrip)           # Pratique et rapide, mais peu flexible 
+
+# Version simple
+ggplot(data = dt,
+       aes(x=Age, y=Handgrip, color = Sex)) +
+  geom_point() 
+
+# Version utilisable
+ggplot(data = dt,
+       aes(x=Age, y=Handgrip, color = Sex)) +
+  geom_point() +
+  scale_color_manual(values = c("#CD2990","#008B8B"),
+                     labels = c("Femmes","Hommes"),
+                     name="Sexe") +
+  theme_classic()
+
+# Version avec tendance linéaires
+ggplot(data = dt,
+       aes(x=Age, y=Handgrip, color = Sex)) +
+  geom_point(shape = 21, alpha = 0.5) +
+  scale_color_manual(values = c("#CD2990","#008B8B"),
+                     labels = c("Femmes","Hommes"),
+                     name="Sexe") +
+  geom_smooth(method = "lm") +
+  theme_classic()
+
+# Version HARD (tendance linéaire par sexe, en fonction de la maladie) et de la masse maigre
+ggplot(data = dt[which(dt$eGFR_IRCavancee != ""),],
+       aes(x=Age, y=Handgrip, 
+           color = Sex,               # Couleur des points
+           size = Lean.Mass_kg)) +    # Taille des points (en fonction de la masse maigre)
+  geom_point(alpha = 0.3) +
+  scale_color_manual(values = c("#CD2990","#008B8B"),
+                     labels = c("Femmes","Hommes"),
+                     name="Sexe") +
+  geom_smooth(method = "lm") +
+  theme_classic() + 
+  facet_wrap(~dt[which(dt$eGFR_IRCavancee != ""),]$eGFR_IRCavancee) +
+  xlab("Age (année)") +
+  ylab("Force de préhension (kg)")
 
 
 
+#### ---- Exercice n°5 ---- ####
+# Représentez graphiquement la relation entre la force musculaire et la masse maigre
+# En dissociant la COULEUR des points avec le stade de la maladie (eGFR Stage)
+# En dissociant la FORCE des points avec la forme
+# En représentant la tendance linéaire (entre force et LM) pour chaque groupe 
 
 
 
