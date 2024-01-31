@@ -1,0 +1,259 @@
+#### Introduction à la science des données avec R ####
+# ____ Master 1 ____ #
+# __ 2023 - 2024 __ #
+
+
+# Sommaire : 
+
+# ___ 1. Charger ses propres données
+# ___ 2. Manipuler ses données
+# ___ 3. Décrire ses données
+#       3.1. Paramètres de position
+#       3.2. Paramètres de dispersion
+# ___ 4. Représenter graphiquement ses données
+#       4.1. Données catégorielles
+#       4.2. Données continues
+
+
+# Dataset disponible au lien suivant : 
+https://osf.io/gfmwv/
+  
+# Mot de passe du dataset : 
+Master1_RStudio
+
+#### ____ Introduction au packages ____ ####
+
+# Pour télécharger un tout nouveau package sur l'ordinateur (e.g., prettyR) : 
+
+install.packages("prettyR") # A REALISER QU'UNE SEULE FOIS SUR L'ORDINATEUR
+
+# Une fois téléchargé dans la librairie, il faut l'appeler :
+
+library(prettyR) # A chaque ouverture de session de RStudio, il faudra appeler le packages si on veux utiliser ses fonctions
+
+
+#### ____ 1. Charges ses propres données ____ ####
+
+dt = read.csv("C:\\Users\\XXXX",
+              header = TRUE,    # Indique que la première ligne du fichier = entêtes
+              sep = ";",        # Symbole de séparation des cellules
+              dec = ",")        # Symbole de décimale
+
+# On vérifie que tout est bon ? 
+
+summary(dt$BMI)
+
+
+#### ____ 2. Manipuler ses données ____ ####
+
+  # L'objet " dt " est une matric comprenant nos données
+# A quoi ressemble ma base de données
+
+nrow(dt)    # Combien de LIGNE y a t-il ?
+ncol(dt)    # Combien de COLONNE y a t-il ?
+
+
+# La matrice est ordonnée de la manière suivante : 
+  # dt        =    [ LIGNE , COLONNE ]
+  # Exemple : 
+
+# Je veux isoler la LIGNE 124
+
+dt124 = dt[124 , ]     # L'objet dt124 contient la LIGNE 124
+dt124
+
+# Je veux isoler toutes les LIGNES de l'individu 67
+
+Indiv67 = dt[dt$PatientId==67 , ]      # Attention, la recherche de text requière des guillemets : dt$COLONNE == "texte"
+Indiv67
+
+# Et je veux résumer les informations de l'invididu choisi
+
+summary(Indiv67)
+
+# Maintenant, je veux analyser une seule information de la base : l'âge
+# Je dois donc isoler la COLONNE "Age"
+
+# 1- Je peux l'appeler directement
+colAge = dt$Age
+colAge    
+
+# 2- Ou je peux trouver son numéro de colonne
+
+id <- which(colnames(dt)=='Age')    # Pratique quand on veux plusieurs colonnes à la suite (e.g., matrices)
+colAge = dt[,id]
+colAge
+
+# Et si je veux conserver plusieurs COLONNES à la fois 
+# Je peux créer une liste (un vecteur) de nom de COLONNE en créant
+
+anthropoDT = dt[, c("Age","Sex","Height","Weight")]
+
+
+# Pour créer une nouvelle colonne, par exemple en transformant le force de Handgrip (kg) en Newton
+
+ncol(dt)
+dt$HandgripN = dt$Handgrip * 9.81
+ncol(dt)                      # J'ai une colonne de plus (à la fin), qui porte le nom "HandgripN"
+summary(dt$HandgripN)         # Je peux la résumer
+
+# Je peux également identifier s'il manque des donnes "NA"
+
+missing_HG = is.na(dt$HandgripN)    # TRUE = Missing, FALSE = Present
+table(missing_HG)["FALSE"]          # How many available data ?
+
+
+#### ---- EXERCICE n°1 ---- ####
+# Introduction aux conditions logiques
+
+# Combien de femmes ont plus de 80 ans ? 
+
+
+# Et combien d'hommes ont plus de 80 ans et un IMC >= 35
+
+
+
+#### ____ 3. Décrire ses données ____ ####
+
+  # Pour décrire ses données, on peux utiliser des paramètres de position
+  # e.g., moyenne, médiane, quartiles
+
+## A) La MOYENNE ##
+  # Solution 1 : Pratique, et efficace
+
+summary(dt$Age)    
+
+  # Solution 2 : Utile quand on ne veux qu'une valeur
+
+mean(dt$Age, na.rm = TRUE)  # na.rm : TRUE, permet de ne pas bloquer en cas de donnée manquante (e.g., Handgrip)
+
+  # Solution 3 : Mathématique
+
+sum(dt$Age) / length(dt$Age)
+
+## B) La médiane ##
+
+median(dt$Age)
+
+## C) Les QUARTILES ##
+
+quantile(dt$BMI, na.rm = TRUE)     # na.rm = TRUE obligatoire, car aucune valeur manquante n'est autorisé
+
+quantile(dt$BMI, 
+         prob=c(.25,.5,.75),
+         na.rm = TRUE)
+
+round(quantile(dt$BMI, 
+         prob=c(.25,.5,.75),
+         na.rm = TRUE),1)         # On arrondi, c'est plus clair
+
+## Description intelligente et multiple ##
+
+library(prettyR)
+
+describe(dt$Age, num.desc=c("mean","median","sd")) # num.desc = c("mean","median","var","sd","valid.n")
+
+# Pour calculer une information en fonction de groupe
+# Ici, l'age MOYEN et l'ECART-TYPE en fonction du sex :
+
+tapply(dt$Age, dt$Sex, "mean", na.rm = FALSE)
+tapply(dt$Age, dt$Sex, "sd", na.rm = FALSE)
+
+
+#### ---- EXERCICE n° 2 ---- ####
+
+## Est-ce que les femmes âgées (>=60 ans) ont moins de force de Handgrip que les femmes plus jeunes ? Que concluez vous ?
+# Faites la même chose pour les hommes
+
+# Femmes
+
+
+
+# Hommes
+
+
+
+#### ____ 4. Représenter graphiquement ses données ____ ####
+#### _ 4.1. Les données catégorielles _ ####
+
+# Exemple, on veut le nombre d'observation d'homme et de femme
+nF = nrow(dt[dt$Sex=="F",])
+nM = nrow(dt[dt$Sex=="M",])
+
+barplot(c(nF,nM))
+        
+# Version pimpée
+barplot(c(nF,nM),
+        names.arg = c("Femmes","Hommes"),   # Nom des colonnes
+        col = c("pink","blue"),             # Couleurs (désolé pour les clichés)
+        border = "white",                   # Bords des colonnes
+        xlab = "Sexes",             
+        ylab = "Effectif (n)",
+        horiz = FALSE)                      # horizontal ou vertical
+
+
+#### ---- EXERCICE n° 3 ---- ####
+# Seulement au sein de la première visite (No Sesion), 
+# représentez le POURCENTAGE d'individu sarcopénique chez les femmes et les hommes
+
+
+
+
+
+#### __ 4.2. Les données continues __ ####
+
+# Identifier une distribution
+# _ 4.1. L'histogram _ #
+
+hist(dt$Age)                        # Possibilité simple et efficace
+
+ggplot(data = dt, aes(x=Age)) +     # Possibilité beaucoup plus modulable, exemple :
+  geom_histogram()  
+
+
+ggplot(data = dt, aes(x=Age, fill=Sex)) +    # En fonction du sexe
+  geom_histogram()                           # Les COLONNES les unes sur les autres
+
+ggplot(data = dt, aes(x=Age, fill=Sex)) +    # En fonction du sexe
+  geom_histogram(position="dodge")           # les COLONNES l'une à coté des autres
+
+# Un peu plus pimpé
+
+ggplot(data = dt, aes(x=Age, fill=Sex)) +    # En fonction du sexe
+  geom_histogram(binwidth = 5,               # Une barre = 5 ans
+                 position="dodge", 
+                 color = "black")  +         # Contours noir
+  scale_fill_manual(values = c("#CD2990","#008B8B"),
+                    labels = c("Femmes","Hommes"),
+                    name="Sexe") +
+  theme_classic() +
+  xlab("Age (année)") +
+  ylab("Effectif (pour 5 ans)")
+
+
+#### ---- EXERCICE n°4 ---- ####
+# Représentez graphiquement la dispersion de la force musculaire entre les statuts d'activité physique
+
+
+
+
+
+# _ 4.1. Le scatter plot ( x ~ y )
+
+# On veux observer la relation entre l'âge et la force de Handgrip
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
