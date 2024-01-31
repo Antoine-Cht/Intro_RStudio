@@ -199,6 +199,9 @@ barplot(c(nF,nM),
 
 
 
+library(ggplot2)
+# Ressources GGPLOT 2 : https://rstudio.github.io/cheatsheets/data-visualization.pdf
+
 
 #### __ 4.2. Les données continues __ ####
 
