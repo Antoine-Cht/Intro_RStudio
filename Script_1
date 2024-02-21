@@ -3,38 +3,46 @@
 # __ 2023 - 2024 __ #
 
 
-# Sommaire : 
+#### Sommaire :                            ####
 
 # ___ 1. Charger ses propres données
 # ___ 2. Manipuler ses données
+            # EXERCICE 1
 # ___ 3. Décrire ses données
 #       3.1. Paramètres de position
 #       3.2. Paramètres de dispersion
+            # EXERCICE 2
 # ___ 4. Représenter graphiquement ses données
 #       4.1. Données catégorielles
+            # EXERCICE 3
 #       4.2. Données continues
+#          - Univariées
+            # EXERCICE 4
+#          - Bivariées
+            # EXERCICE 5
+#     5. Supplément : descriptions supplémentaires et réflexions
 
 
 # Dataset disponible au lien suivant : 
 https://osf.io/gfmwv/
   
-# Mot de passe du dataset : 
-Master1_RStudio
+  # Mot de passe du dataset : 
+x
 
 #### ____ Introduction au packages ____ ####
 
 # Pour télécharger un tout nouveau package sur l'ordinateur (e.g., prettyR) : 
 
-install.packages("prettyR") # A REALISER QU'UNE SEULE FOIS SUR L'ORDINATEUR
+#         install.packages("ggrain") # A REALISER QU'UNE SEULE FOIS SUR L'ORDINATEUR
 
 # Une fois téléchargé dans la librairie, il faut l'appeler :
 
-library(prettyR) # A chaque ouverture de session de RStudio, il faudra appeler le packages si on veux utiliser ses fonctions
+library(prettyR) # A chaque ouverture de session de RStudio, il faudra appeler le package si on veut utiliser ses fonctions
 
 
 #### ____ 1. Charges ses propres données ____ ####
 
-dt = read.csv("C:\\Users\\XXXX",
+dt = read.csv("C:\\Users\\XXXX\\nom_basededonnee.csv",
               header = TRUE,    # Indique que la première ligne du fichier = entêtes
               sep = ";",        # Symbole de séparation des cellules
               dec = ",")        # Symbole de décimale
@@ -46,7 +54,7 @@ summary(dt$BMI)
 
 #### ____ 2. Manipuler ses données ____ ####
 
-  # L'objet " dt " est une matric comprenant nos données
+# L'objet " dt " est une matric comprenant nos données
 # A quoi ressemble ma base de données
 
 nrow(dt)    # Combien de LIGNE y a t-il ?
@@ -54,8 +62,8 @@ ncol(dt)    # Combien de COLONNE y a t-il ?
 
 
 # La matrice est ordonnée de la manière suivante : 
-  # dt        =    [ LIGNE , COLONNE ]
-  # Exemple : 
+# dt        =    [ LIGNE , COLONNE ]
+# Exemple : 
 
 # Je veux isoler la LIGNE 124
 
@@ -108,26 +116,23 @@ table(missing_HG)["FALSE"]          # How many available data ?
 
 # Combien de femmes ont plus de 80 ans ? 
 
-
 # Et combien d'hommes ont plus de 80 ans et un IMC >= 35
-
-
 
 #### ____ 3. Décrire ses données ____ ####
 
-  # Pour décrire ses données, on peux utiliser des paramètres de position
-  # e.g., moyenne, médiane, quartiles
+# Pour décrire ses données, on peux utiliser des paramètres de position
+# e.g., moyenne, médiane, quartiles
 
 ## A) La MOYENNE ##
-  # Solution 1 : Pratique, et efficace
+# Solution 1 : Pratique, et efficace
 
 summary(dt$Age)    
 
-  # Solution 2 : Utile quand on ne veux qu'une valeur
+# Solution 2 : Utile quand on ne veux qu'une valeur
 
-mean(dt$Age, na.rm = TRUE)  # na.rm : TRUE, permet de ne pas bloquer en cas de donnée manquante (e.g., Handgrip)
+mean(dt$Handgrip, na.rm = TRUE)  # na.rm : TRUE, permet de ne pas bloquer en cas de donnée manquante (e.g., Handgrip)
 
-  # Solution 3 : Mathématique
+# Solution 3 : Mathématique
 
 sum(dt$Age) / length(dt$Age)
 
@@ -143,9 +148,9 @@ quantile(dt$BMI,
          prob=c(.25,.5,.75),
          na.rm = TRUE)
 
-round(quantile(dt$BMI, 
-         prob=c(.25,.5,.75),
-         na.rm = TRUE),1)         # On arrondi, c'est plus clair
+QUART = quantile(dt$BMI,  prob=c(.25,.5,.75), na.rm = TRUE)        # On arrondi, c'est plus clair
+
+round(QUART,2)
 
 ## Description intelligente et multiple ##
 
@@ -156,8 +161,9 @@ describe(dt$Age, num.desc=c("mean","median","sd")) # num.desc = c("mean","median
 # Pour calculer une information en fonction de groupe
 # Ici, l'age MOYEN et l'ECART-TYPE en fonction du sex :
 
-tapply(dt$Age, dt$Sex, "mean", na.rm = FALSE)
-tapply(dt$Age, dt$Sex, "sd", na.rm = FALSE)
+tapply(dt$Age, dt$Sex, "mean", na.rm = TRUE)
+
+tapply(dt$Age, dt$Sex, "sd", na.rm = TRUE)
 
 
 #### ---- EXERCICE n° 2 ---- ####
@@ -165,11 +171,7 @@ tapply(dt$Age, dt$Sex, "sd", na.rm = FALSE)
 ## Est-ce que les femmes âgées (>=60 ans) ont moins de force de Handgrip que les femmes plus jeunes ? Que concluez vous ?
 # Faites la même chose pour les hommes
 
-# Femmes
 
-
-
-# Hommes
 
 
 
@@ -181,7 +183,7 @@ nF = nrow(dt[dt$Sex=="F",])
 nM = nrow(dt[dt$Sex=="M",])
 
 barplot(c(nF,nM))
-        
+
 # Version pimpée
 barplot(c(nF,nM),
         names.arg = c("Femmes","Hommes"),   # Nom des colonnes
@@ -201,6 +203,9 @@ barplot(c(nF,nM),
 
 
 #### __ 4.2. Les données continues __ ####
+
+library(ggplot2)
+# Ressources GGPLOT 2 : https://rstudio.github.io/cheatsheets/data-visualization.pdf
 
 # Identifier une distribution
 # _ 4.1. L'histogram _ #
@@ -232,13 +237,14 @@ ggplot(data = dt, aes(x=Age, fill=Sex)) +    # En fonction du sexe
 
 
 #### ---- EXERCICE n°4 ---- ####
-# Représentez graphiquement la dispersion de la force musculaire entre les statuts d'activité physique
+# Représentez graphiquement la dispersion de la force musculaire entre les hommes et les femmes
 
 
 
 
 
-# _ 4.1. Le scatter plot ( x ~ y )
+
+# _ 4.1. Le scatter plot ( x ~ y ) - #
 
 # On veux observer la relation entre l'âge et la force de Handgrip
 plot(dt$Age, dt$Handgrip)           # Pratique et rapide, mais peu flexible 
@@ -287,18 +293,176 @@ ggplot(data = dt[which(dt$eGFR_IRCavancee != ""),],
 #### ---- Exercice n°5 ---- ####
 # Représentez graphiquement la relation entre la force musculaire et la masse maigre
 # En dissociant la COULEUR des points avec le stade de la maladie (eGFR Stage)
-# En dissociant la FORCE des points avec la forme
 # En représentant la tendance linéaire (entre force et LM) pour chaque groupe 
 
 
 
 
 
+#### ___ 5. Supplément ___ ####
+#               : Résumé et 
+#                 mise en application        
+
+# Possibilité de visualisation de la force musculaire entre les sexes : 
+
+# _ Possibilité 1: L'histogram
+
+ggplot(dt, aes(x=HandgripN, fill = Sex)) + 
+  geom_histogram(binwidth = 5,
+                 position = "identity",
+                 color = "black", 
+                 alpha = 0.2) +
+  theme_classic() +
+  ylab("Effectifs (n)") + 
+  xlab("Force de préhension (N)") +
+  scale_fill_manual(values = c("red","blue"),
+                    name = "Sexe")
+
+
+# Possibilité 1: La densité (donc proportion relatives)
+
+ggplot(dt, aes(x=HandgripN, fill = Sex)) + 
+  geom_density(outline.type = "full",
+               color = "white", 
+               alpha = 0.2,
+               size = 2) +
+  theme_classic() +
+  ylab("Propostion") + 
+  xlab("Force de préhension (N)") +
+  scale_fill_manual(values = c("red","blue"),
+                    name = "Sexe")
+
+# Possibilité 3: Le Box plot avec les points
+
+ggplot(dt, 
+       aes(x=Sex, y=HandgripN, fill = Sex)) +
+  geom_jitter(width = 0.1,             # Jitter permet de représenter un nuage sur un axe 
+              alpha = 0.1,
+              color = "grey70") +                             # Layer 2
+  geom_boxplot(outlier.alpha = 0,      # Suppression des point outliers
+               alpha = 0.5,
+               size = 1) +           # Layer 3
+  theme_classic() +
+  ylab("Force de préhension (N)") +
+  xlab("Sexe")
+
+# install.packages(ggrain)
+library(ggrain)
+
+ggplot(dt, 
+       aes(x=Sex, y=HandgripN, fill = Sex)) +
+  geom_rain(alpha = 0.2,
+            rain.side = "r") +
+  theme_classic() +
+  scale_fill_manual(values = c("red","blue"),
+                    name = "Sexe") +
+  xlab("Sexe") +
+  ylab("Force de préhension (N)")
 
 
 
+# Possibilité n°4
+
+#install.packages(ggridges)
+library(ggridges)
+
+ggplot(dt, 
+       aes(y=Sex, x=HandgripN, fill = stat(x), color = Sex)) +
+  geom_density_ridges_gradient(scale = 3, 
+                               size = 1) +
+  scale_fill_viridis_c(option = "C", name = "Force (N)") +
+  scale_color_manual(values = c("red","blue"),
+                     name = "Sexe") +
+  theme_classic() +
+  xlab("Sexe") +
+  ylab("Force de préhension (N)")
 
 
+
+## En observant les distributions de la force en fonction du sexe, 
+#  Est-il possible de conclure à une différence entre les groupes ? 
+
+# Si on reprend la distribution : 
+plt1 = ggplot(dt, aes(x=HandgripN, fill = Sex)) + 
+  geom_density(color = "black", 
+               alpha = 0.5) +
+  theme_classic() +
+  ylab("Proportion") + 
+  xlab("Force de préhension (N)") +
+  scale_fill_manual(values = c("red","blue"),
+                    name = "Sexe")
+plt1
+
+
+# On ajoute graphiquement les moyennes : 
+
+mn  = tapply(dt$HandgripN, dt$Sex, 'mean', na.rm = TRUE)    # Moyennes
+sds = tapply(dt$HandgripN, dt$Sex, 'sd', na.rm = TRUE)      # Standard déviation
+
+plt2 = plt1 + geom_vline(xintercept = mn, 
+                         size = 1.5)
+plt2
+
+# Et les écarts type (dans les zones grises)
+
+plt3 = ggplot(dt, aes(x=HandgripN, fill = Sex)) + 
+  geom_vline(xintercept = mn, 
+             size = 1.5) +
+  annotate("rect", fill = "grey90", alpha = 0.5,
+           xmin = unname(mn-sds), xmax = unname(sds+mn), 
+           ymin = c(0,0), ymax = c(0.008,0.008)) +
+  geom_density(color = "black", 
+               alpha = 0.5) +
+  theme_classic() +
+  ylab("Proportion") + 
+  xlab("Force de préhension (N)") +
+  scale_fill_manual(values = c("red","blue"),
+                    name = "Sexe") 
+
+plt3
+
+
+# Est-ce qu'on peut conclure à une différence statistique ? 
+
+# Pour répondre à cette question, on va : ;
+
+# Calculer la probabilité 
+# de retrouver une valeur d'un groupe (e.g., F) au moins aussi extrême
+# par rapport à un autre groupe (e.g., M), 
+# dans l'hypothèse ou les 2 groupes sont égaux (c.a.d. exactement les mêmes moyennes attendues). 
+
+# Test T
+t.test(dt$Handgrip ~ dt$Sex)      # Les données de Handgrip EN FONCTION ( ~ ) du sexe
+
+# Regardez la probabilité, que concluez vous ? 
+
+# Situation moins favorable : 
+dt2 = dt
+dt2[dt2$Sex == "F",]$HandgripN = dt2[dt$Sex == "F",]$HandgripN + 100
+
+mn  = tapply(dt2$HandgripN, dt2$Sex, 'mean', na.rm = TRUE)    # Moyennes
+sds = tapply(dt2$HandgripN, dt2$Sex, 'sd', na.rm = TRUE)      # Standard déviation
+
+
+plt4 = ggplot(dt2, aes(x=HandgripN, fill = Sex)) + 
+  geom_vline(xintercept = mn, 
+             size = 1.5) +
+  annotate("rect", fill = "grey90", alpha = 0.5,
+           xmin = unname(mn-sds), xmax = unname(sds+mn), 
+           ymin = c(0,0), ymax = c(0.008,0.008)) +
+  geom_density(color = "black", 
+               alpha = 0.5) +
+  theme_classic() +
+  ylab("Proportion") + 
+  xlab("Force de préhension (N)") +
+  scale_fill_manual(values = c("red","blue"),
+                    name = "Sexe")
+plt4
+
+
+t.test(dt2$HandgripN ~ dt2$Sex)
+
+# Dans ce contexte, que concluez vous ? 
 
 
 
