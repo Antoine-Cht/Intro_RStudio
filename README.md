@@ -1,4 +1,4 @@
-# 31 - 01 - 2024
+# IFEPSA - UCO
 
 # These R scripts are dedicated to pedagogic purposes.
 
